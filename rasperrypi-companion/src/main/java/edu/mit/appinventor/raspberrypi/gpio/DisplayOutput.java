@@ -8,18 +8,13 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
 import com.pi4j.io.gpio.GpioPinDigitalOutput;
 import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.RaspiPin;
 
-import edu.mit.mqtt.raspberrypi.Messages.PinProperty;
-import edu.mit.mqtt.raspberrypi.Messages.PinValue;
-import edu.mit.mqtt.raspberrypi.Pin;
-import edu.mit.mqtt.raspberrypi.Topics;
+import edu.mit.mqtt.raspberrypi.model.messaging.Topic;
 
 public class DisplayOutput implements MqttCallback {
 
@@ -31,7 +26,7 @@ public class DisplayOutput implements MqttCallback {
   final GpioController gpio = GpioFactory.getInstance();
 
   // provision gpio pin #02 as an output pin and turn on
-  final GpioPinDigitalOutput tempLowIndicator = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_02, "BlueLED",
+  final GpioPinDigitalOutput indicator = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_02, "BlueLED",
       PinState.LOW);
 
   public DisplayOutput() {
@@ -44,23 +39,11 @@ public class DisplayOutput implements MqttCallback {
       if (temperature > 80) {
 	System.out.println("FIRE FIRE!!!!!! " + new String(pMessage.getPayload()));
       } else if (temperature < 40) {
-	tempLowIndicator.high();
+	indicator.high();
 	System.out.println("BRRRR Freezing !!!!!! " + new String(pMessage.getPayload()));
       } else {
 	System.out.println("Temperature Normal. " + new String(pMessage.getPayload()));
       }
-    } else if (pTopic.equals(Topics.INTERNAL_TOPIC)) {
-      GsonBuilder builder = new GsonBuilder();
-      Gson gson = builder.create();
-      Pin pinFromJson = gson.fromJson(new String(pMessage.getPayload()), Pin.class);
-      if (pinFromJson.pinProperty.equals(PinProperty.PIN_STATE)) {
-	if (pinFromJson.pinValue.equals(PinValue.HIGH)) {
-	  tempLowIndicator.high();
-	} else if (pinFromJson.pinValue.equals(PinValue.LOW)) {
-	  tempLowIndicator.low();
-	}
-      }
-
     } else {
       System.out.println(pTopic + " " + new String(pMessage.getPayload()));
     }
@@ -80,10 +63,10 @@ public class DisplayOutput implements MqttCallback {
       mClient.setCallback(this);
 
       mClient.subscribe(TEMPERATURE);
-      mClient.subscribe(Topics.INTERNAL_TOPIC);
+      mClient.subscribe(Topic.INTERNAL.name());
 
       // set shutdown state for this pin
-      tempLowIndicator.setShutdownOptions(true, PinState.LOW);
+      indicator.setShutdownOptions(true, PinState.LOW);
 
       // We’ll now idle here sleeping, but your app can be busy
       // working here instead

@@ -1,0 +1,33 @@
+package edu.mit.appinventor.raspberrypi.gpio.board;
+
+import edu.mit.appinventor.raspberrypi.gpio.Board;
+import edu.mit.mqtt.raspberrypi.model.device.RaspberrryPiModel;
+
+public class BoardFactory {
+  
+  public static Board getBoard(RaspberrryPiModel pRaspberrryPiModel) {
+    if (pRaspberrryPiModel.equals(RaspberrryPiModel.Pi1A)) {
+      return new Pi1A();
+    }
+    if (pRaspberrryPiModel.equals(RaspberrryPiModel.Pi1APlus)) {
+      return new Pi1APlus();
+    }
+    if (pRaspberrryPiModel.equals(RaspberrryPiModel.Pi1B)) {
+      return new Pi1B();
+    }
+    if (pRaspberrryPiModel.equals(RaspberrryPiModel.Pi1BPlus)) {
+      return new Pi1BPlus();
+    }
+    if (pRaspberrryPiModel.equals(RaspberrryPiModel.Pi1Bv2)) {
+      return new Pi1Bv2();
+    }
+    if (pRaspberrryPiModel.equals(RaspberrryPiModel.Pi2B)) {
+      return new Pi2B();
+    }
+    if (pRaspberrryPiModel.equals(RaspberrryPiModel.Pi3B)) {
+      return new Pi3B();
+    }
+    return null;
+  }
+
+}
