@@ -23,6 +23,4 @@ public abstract class AbstractHeader implements Header{
     return pinConfiguration.inverse().get(pGpioPin);
   }
 
-
-
 }
