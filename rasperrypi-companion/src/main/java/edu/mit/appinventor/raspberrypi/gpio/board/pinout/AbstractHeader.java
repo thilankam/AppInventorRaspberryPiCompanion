@@ -9,8 +9,8 @@ import com.pi4j.io.gpio.Pin;
  * @author Thilanka Munasinghe (thilankawillbe@gmail.com)
  *
  */
-public abstract class AbstractHeader implements Header{
-  
+public abstract class AbstractHeader implements Header {
+
   protected BiMap<Integer, Pin> pinConfiguration;
 
   @Override

@@ -3,8 +3,15 @@ package edu.mit.appinventor.raspberrypi.gpio.board;
 import edu.mit.appinventor.raspberrypi.gpio.Board;
 import edu.mit.mqtt.raspberrypi.model.device.RaspberrryPiModel;
 
+/**
+ * This is the BoardFactory class. In this class, the Raspberry Pi board models
+ * are generated.
+ * 
+ * @author Thilanka Munasinghe (thilankawillbe@gmail.com)
+ *
+ */
 public class BoardFactory {
-  
+
   public static Board getBoard(RaspberrryPiModel pRaspberrryPiModel) {
     if (pRaspberrryPiModel.equals(RaspberrryPiModel.Pi1A)) {
       return new Pi1A();
