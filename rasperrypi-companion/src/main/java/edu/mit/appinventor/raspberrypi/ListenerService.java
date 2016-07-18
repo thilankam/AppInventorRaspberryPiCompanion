@@ -41,7 +41,7 @@ public class ListenerService implements Runnable {
       LOGGER.debug("Message received from topic: " + mTopic + "\tMessage: " + mMessage.toString());
     }
 
-    if (mTopic.equals(Topic.INTERNAL.toString())) {
+    if (mTopic.equals(TopicRegistry.getInstance().getInternalTopic())) {
 
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("Internal topic found.");

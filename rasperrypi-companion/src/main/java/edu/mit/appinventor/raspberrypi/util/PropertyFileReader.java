@@ -6,15 +6,17 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
- * This is the PropertyFileReader class.
+ * This is the PropertyFileReader class that reads essential properties from
+ * config.properties.
+ * 
  * @author Thilanka Munasinghe (thilankawillbe@gmail.com)
  *
  */
-
 public class PropertyFileReader {
-  
+
   public enum Values {
-    MODEL("model"), BROKER_ADDRESS("brokerAddress"), BROKER_PORT("brokerPort"), QOS("qos");
+    MODEL("model"), BROKER_ADDRESS("brokerAddress"), BROKER_PORT("brokerPort"), QOS("qos"), IDENTIFIER_FILE(
+        "identifierFile");
 
     private final String name;
 
@@ -29,7 +31,7 @@ public class PropertyFileReader {
     public String toString() {
       return name;
     }
-    
+
   }
 
   private Properties prop;
@@ -69,5 +71,5 @@ public class PropertyFileReader {
   public String getProperty(Values pProperty) {
     return prop.getProperty(pProperty.toString());
   }
-  
+
 }

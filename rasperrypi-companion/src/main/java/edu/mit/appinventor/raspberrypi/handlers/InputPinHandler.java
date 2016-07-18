@@ -17,6 +17,7 @@ import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 
 import edu.mit.appinventor.raspberrypi.PinRegistry;
+import edu.mit.appinventor.raspberrypi.TopicRegistry;
 import edu.mit.appinventor.raspberrypi.gpio.Board;
 import edu.mit.appinventor.raspberrypi.gpio.board.BoardFactory;
 import edu.mit.appinventor.raspberrypi.gpio.board.pinout.Header;
@@ -112,7 +113,7 @@ public class InputPinHandler implements PinHandler, GpioPinListenerDigital {
       }
       MqttMessage message = new MqttMessage(content.getBytes());
       message.setQos(Integer.parseInt(PropertyFileReader.getInstance().getProperty(Values.QOS)));
-      mClient.publish(Topic.INTERNAL.toString(), message);
+      mClient.publish(TopicRegistry.getInstance().getInternalTopic(), message);
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("Message: " + content + " published.");
       }

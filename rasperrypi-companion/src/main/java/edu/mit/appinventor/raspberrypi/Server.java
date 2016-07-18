@@ -1,5 +1,12 @@
 package edu.mit.appinventor.raspberrypi;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -31,6 +38,10 @@ import edu.mit.mqtt.raspberrypi.model.messaging.Topic;
  */
 public class Server implements MqttCallback {
 
+  private String mIdentifier;
+  
+  private String mAbsoluteFilePath;
+
   MqttClient mClient;
 
   private ExecutorService executorService;
@@ -40,6 +51,9 @@ public class Server implements MqttCallback {
   private static final int THREAD_POOL_SIZE = 10;
 
   public Server() {
+
+    initializeIdentifier();
+    displayIdentifier();
 
     final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("RaspberryPiServer-%d").setDaemon(true)
         .build();
@@ -67,8 +81,45 @@ public class Server implements MqttCallback {
 
   }
 
+  private void initializeIdentifier() {
+    String identifierFileName = PropertyUtil.getIdentifierFileName();
+    File identifierFile = new File(identifierFileName);
+    mAbsoluteFilePath = identifierFile.getAbsolutePath();
+    if (identifierFile.exists()){
+      FileReader fileReader;
+      try {
+        fileReader = new FileReader(identifierFile);
+        BufferedReader bufferedReader = new BufferedReader(fileReader);
+        mIdentifier = bufferedReader.readLine();
+        bufferedReader.close();
+      } catch (IOException e) {
+        LOGGER.error("Error reading the identifier file!", e);
+      }
+    } else {
+      mIdentifier = UUID.randomUUID().toString();
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Creating the identifier file " + identifierFile.getAbsolutePath() + " to store " + mIdentifier);
+      }
+      try {
+        identifierFile.createNewFile();
+        FileWriter fileWriter = new FileWriter(identifierFile);
+        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+        bufferedWriter.write(mIdentifier);
+        bufferedWriter.close();
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("Identifier file " + identifierFile.getAbsolutePath() + " to store " + mIdentifier + " created.");
+        }
+      } catch (IOException e) {
+        LOGGER.error("Error creating the identifier file!", e);
+      }
+      
+    }
+  }
+
   private void subscribeToInternalTopic() {
-    String topic = Topic.INTERNAL.toString();
+    
+    String topic = createInternalTopic();
+    
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Subscribing to topic " + topic + "...");
     }
@@ -80,15 +131,61 @@ public class Server implements MqttCallback {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Subscribed to topic " + topic + ".");
     }
+  }
 
+  private String createInternalTopic() {
+    StringBuilder topicBuilder = new StringBuilder();
+    topicBuilder.append(Topic.INTERNAL.toString());
+    topicBuilder.append(mIdentifier);
+    String topic = topicBuilder.toString();
+    TopicRegistry.getInstance().setInternalTopic(topic);
+    return topic;
   }
 
   public static void main(String[] args) {
     Server server = new Server();
-    server.startServer();
+    server.idle();
   }
 
-  private void startServer() {
+  private void displayIdentifier() {
+    
+    String welcome = "RaspberryPiCompanion Server for  App Inventor starting...";
+    String instruction1 = "Please copy and paste the following string for the 'identifier' parameter ";
+    String instruction2 =  "in the 'Initialize' method block of your RaspberryPiServer component:";
+    String instruction3 =  "(If you wish to reset this identifier, delete the cached identifier file available at: ";
+    String instruction4 =  "and restart the companion application.) ";
+
+    int maxLength = mIdentifier.toString().length() > welcome.length() ? mIdentifier.toString().length()
+        : welcome.length();
+    maxLength = instruction1.length() > maxLength ? instruction1.length() : maxLength;
+    maxLength = instruction2.length() > maxLength ? instruction2.length() : maxLength;
+    maxLength = instruction3.length() > maxLength ? instruction3.length() : maxLength;
+    maxLength = instruction4.length() > maxLength ? instruction4.length() : maxLength;
+    maxLength = mAbsoluteFilePath.length() > maxLength ? mAbsoluteFilePath.length() : maxLength;
+
+    for (int i = 0; i < maxLength + 2; i++) {
+      System.out.print("*");
+    }
+    System.out.println();
+    System.out.println(welcome);
+    System.out.println();
+    System.out.println(instruction1);
+    System.out.println(instruction2);
+    System.out.println();
+    System.out.println(mIdentifier);
+    System.out.println();
+    System.out.println(instruction3);
+    System.out.println(mAbsoluteFilePath);
+    System.out.println(instruction4);
+    for (int i = 0; i < maxLength + 2; i++) {
+      System.out.print("*");
+    }
+    System.out.println();
+
+  }
+
+  private void idle() {
+
     // We’ll now idle here sleeping waiting for any messages received.
     while (true) {
       try {
