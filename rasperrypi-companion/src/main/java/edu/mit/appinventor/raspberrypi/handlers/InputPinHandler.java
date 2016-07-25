@@ -8,8 +8,6 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.pi4j.io.gpio.GpioController;
-import com.pi4j.io.gpio.GpioFactory;
 import com.pi4j.io.gpio.GpioPinDigitalInput;
 import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.PinState;
@@ -30,7 +28,6 @@ import edu.mit.mqtt.raspberrypi.model.device.PinDirection;
 import edu.mit.mqtt.raspberrypi.model.device.PinProperty;
 import edu.mit.mqtt.raspberrypi.model.device.PinValue;
 import edu.mit.mqtt.raspberrypi.model.device.RaspberrryPiModel;
-import edu.mit.mqtt.raspberrypi.model.messaging.Topic;
 
 /**
  * This is the InputPinHandler class which listens to any changes in the Gpio
@@ -72,13 +69,11 @@ public class InputPinHandler implements PinHandler, GpioPinListenerDigital {
     Pin pin = mHeader.getGpioPin(pHeaderPin.number);
     String label = pHeaderPin.label;
 
-    // create gpio controller
-    final GpioController gpio = GpioFactory.getInstance();
     GpioPinDigitalInput gpioPin;
     if (PinRegistry.getInstance().exists(pin)) {
       gpioPin = (GpioPinDigitalInput) PinRegistry.getInstance().get(pin);
     } else {
-      gpioPin = gpio.provisionDigitalInputPin(pin, label);
+      gpioPin = PinRegistry.getInstance().getGpioController().provisionDigitalInputPin(pin, label);
       gpioPin.addListener(this);
       PinRegistry.getInstance().add(pin, gpioPin);
     }

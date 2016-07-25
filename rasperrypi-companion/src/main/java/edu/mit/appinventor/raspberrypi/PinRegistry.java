@@ -3,6 +3,8 @@ package edu.mit.appinventor.raspberrypi;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.pi4j.io.gpio.GpioController;
+import com.pi4j.io.gpio.GpioFactory;
 import com.pi4j.io.gpio.Pin;
 
 /**
@@ -17,6 +19,9 @@ public class PinRegistry {
   private static PinRegistry instance = null;
 
   private static Map<Pin, Object> pinCache;
+
+  // create gpio controller
+  private final GpioController gpioController = GpioFactory.getInstance();
 
   protected PinRegistry() {
     // Exists only to defeat instantiation.
@@ -44,5 +49,9 @@ public class PinRegistry {
 
   public Object get(Pin pPin) {
     return pinCache.get(pPin);
+  }
+  
+  public GpioController getGpioController(){
+    return gpioController;
   }
 }

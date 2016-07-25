@@ -3,8 +3,6 @@ package edu.mit.appinventor.raspberrypi.handlers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.pi4j.io.gpio.GpioController;
-import com.pi4j.io.gpio.GpioFactory;
 import com.pi4j.io.gpio.GpioPinDigitalOutput;
 import com.pi4j.io.gpio.Pin;
 
@@ -37,9 +35,6 @@ public class OutputPinHandler implements PinHandler {
     Pin pin = header.getGpioPin(pHeaderPin.number);
     String label = pHeaderPin.label;
 
-    // create gpio controller
-    final GpioController gpio = GpioFactory.getInstance();
-
     GpioPinDigitalOutput outputPin;
     if (PinRegistry.getInstance().exists(pin)) {
       if (LOGGER.isDebugEnabled()) {
@@ -52,7 +47,7 @@ public class OutputPinHandler implements PinHandler {
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("Pin does not exist in cache.");
       }
-      outputPin = gpio.provisionDigitalOutputPin(pin, label);
+      outputPin = PinRegistry.getInstance().getGpioController().provisionDigitalOutputPin(pin, label);
       PinRegistry.getInstance().add(pin, outputPin);
     }
 

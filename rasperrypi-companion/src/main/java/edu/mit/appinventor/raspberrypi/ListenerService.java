@@ -10,7 +10,6 @@ import edu.mit.mqtt.raspberrypi.HeaderPin;
 import edu.mit.mqtt.raspberrypi.Messages;
 import edu.mit.mqtt.raspberrypi.model.device.PinDirection;
 import edu.mit.mqtt.raspberrypi.model.device.PinProperty;
-import edu.mit.mqtt.raspberrypi.model.messaging.Topic;
 
 /**
  * ListenerService that listens for any incoming messages and delegates those
