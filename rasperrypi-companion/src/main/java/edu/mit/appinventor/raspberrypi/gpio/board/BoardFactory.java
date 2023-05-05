@@ -34,6 +34,9 @@ public class BoardFactory {
     if (pRaspberrryPiModel.equals(RaspberrryPiModel.Pi3B)) {
       return new Pi3B();
     }
+    if (pRaspberrryPiModel.equals(RaspberrryPiModel.Pi4B)) {
+      return new Pi4B();
+    }
     return null;
   }
 
